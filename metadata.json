@@ -1,0 +1,7 @@
+{
+  "name": "Cape Sun Co - SA Summer Essentials & Storefront",
+  "description": "Welcome to Cape Sun Co, your premier Cape Town destination for summer cooling gear, beach essentials, instant Capitec checkout, 2-4 day hub repacked dispatch, automated WhatsApp updates, and live courier tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

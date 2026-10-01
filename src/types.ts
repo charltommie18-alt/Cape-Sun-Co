@@ -23,6 +23,12 @@ export interface Product {
   videoTitle?: string;
   videoType?: "mp4" | "youtube";
   videoDuration?: string;
+  supplierName?: string;
+  supplierUrl?: string;
+  supplierCostPrice?: number;
+  supplierSku?: string;
+  profitMargin?: number;
+  profitMarginPercent?: number;
 }
 
 export interface BankDetails {
@@ -120,7 +126,13 @@ export interface OrderItem {
         postalCode: string;
       }
     | string;
-  shippingSpeed: "Cape Town Local 2-3 Days (Free)" | "Express Overnight (R69)" | "National JHB/Regional (R49)" | string;
+  shippingSpeed:
+    | "Cape Town Local Courier (R85)"
+    | "National SA Main Centers (R145)"
+    | "Regional SA & Outlying (R175)"
+    | "Express Priority Overnight (R195)"
+    | "International Courier (R495)"
+    | string;
   createdAt: string;
   status: string;
 }

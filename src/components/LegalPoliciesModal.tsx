@@ -326,30 +326,37 @@ export const LegalPoliciesModal: React.FC<Props> = ({
                 <div className="grid sm:grid-cols-2 gap-3">
                   <div className={`p-3.5 rounded-xl border ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-slate-50 border-slate-200"}`}>
                     <div className="font-bold text-xs text-[#0A3D62] dark:text-[#F9CA24] uppercase tracking-wider mb-1">
-                      Local Cape Town &amp; Metro
+                      Local Cape Town &amp; Metro (R85)
                     </div>
-                    <div className="text-lg font-extrabold text-emerald-600 dark:text-emerald-400">2 to 4 Working Days</div>
+                    <div className="text-lg font-extrabold text-emerald-600 dark:text-emerald-400">2 to 3 Working Days</div>
                     <p className="text-xs opacity-75 mt-1">
-                      Every order arrives at our Cape Town hub first for manual quality testing and protective repacking before courier handover. Due to this dedicated inspection, delivery takes 2 to 4 working days (same-day delivery is not offered at this stage).
+                      Every order arrives at our Cape Town hub first for manual quality testing and protective repacking before courier handover. Due to this dedicated inspection, local delivery is completed in 2 to 3 working days.
                     </p>
                   </div>
 
                   <div className={`p-3.5 rounded-xl border ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-slate-50 border-slate-200"}`}>
                     <div className="font-bold text-xs text-[#0A3D62] dark:text-[#F9CA24] uppercase tracking-wider mb-1">
-                      Johannesburg, Durban &amp; Regional
+                      National SA Main Centers (R145) &amp; Regional (R175)
                     </div>
                     <div className="text-lg font-extrabold text-amber-500">3 to 5 Working Days</div>
                     <p className="text-xs opacity-75 mt-1">
-                      Shipped via express road/air freight courier with end-to-end SMS/WhatsApp tracking.
+                      Shipped via The Courier Guy express road/air freight with automated WhatsApp and SMS delivery waybill notifications.
                     </p>
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="font-bold text-sm mb-1 text-slate-800 dark:text-slate-200">4.1 Free Shipping Threshold</h4>
-                  <p className="opacity-80">
-                    Orders exceeding R600 qualify for free standard doorstep delivery nationwide across South Africa. Standard delivery for orders below R600 is charged at a flat rate of R75.
+                  <h4 className="font-bold text-sm mb-1 text-slate-800 dark:text-slate-200">4.1 Courier Logistics Tariffs &amp; Non-Free Delivery Policy</h4>
+                  <p className="opacity-80 leading-relaxed">
+                    All deliveries are handled by professional door-to-door courier services (The Courier Guy for domestic South Africa and DHL Express for international orders). In order to maintain strict quality-check repacking, door-to-door transit insurance, and automated live WhatsApp tracking, delivery is chargeable on all orders without exception:
                   </p>
+                  <ul className="list-disc pl-5 mt-1.5 space-y-1 text-xs opacity-85">
+                    <li><strong>Cape Town Local Courier:</strong> R85 (2 to 3 working days)</li>
+                    <li><strong>National Main Centers (JHB, DBN, PTA, Gqeberha, Bloemfontein):</strong> R145 (3 to 4 working days)</li>
+                    <li><strong>Regional &amp; Outlying Areas SA:</strong> R175 (3 to 5 working days)</li>
+                    <li><strong>Priority Express Overnight:</strong> R195 (Next business day)</li>
+                    <li><strong>International Courier (DHL Express worldwide):</strong> R495 (4 to 7 working days)</li>
+                  </ul>
                 </div>
 
                 <div>

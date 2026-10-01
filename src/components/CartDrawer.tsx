@@ -25,7 +25,8 @@ export const CartDrawer: React.FC<Props> = ({
 
   const subtotal = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
   const bundleDiscount = items.length >= 2 ? 150 : 0;
-  const total = Math.max(0, subtotal - bundleDiscount);
+  const localCourierEstimate = 85;
+  const total = Math.max(0, subtotal - bundleDiscount) + localCourierEstimate;
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -161,11 +162,14 @@ export const CartDrawer: React.FC<Props> = ({
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="opacity-70">Cape Town Delivery:</span>
-                  <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase">FREE</span>
+                  <span className="opacity-70">Courier Shipping (Local CT):</span>
+                  <span className="font-bold text-[#0A3D62] dark:text-[#F9CA24]">R{localCourierEstimate}</span>
+                </div>
+                <div className="text-[10px] opacity-70 italic">
+                  National (R145), Express (R195) &amp; International (R495) chosen at checkout.
                 </div>
                 <div className="pt-2 border-t flex justify-between items-baseline font-black text-base">
-                  <span>Total Amount:</span>
+                  <span>Estimated Total:</span>
                   <span className="text-xl text-[#0A3D62] dark:text-[#F9CA24]">R{total}</span>
                 </div>
               </div>

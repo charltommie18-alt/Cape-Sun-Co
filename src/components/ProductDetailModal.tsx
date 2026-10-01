@@ -270,6 +270,24 @@ export const ProductDetailModal: React.FC<Props> = ({
                 <span className="opacity-60">({product.reviewsCount} reviews) • Cape Town dispatch</span>
               </div>
 
+              {/* Verified Local Sourcing Banner */}
+              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck size={16} className="text-emerald-500 shrink-0" />
+                  <div>
+                    <span className="font-extrabold text-[11px] text-slate-800 dark:text-slate-200">
+                      Closest &amp; Cheapest Verified SA Sourced
+                    </span>
+                    <div className="text-[10px] opacity-70">
+                      {product.supplierName || "Bob Shop SA / Local Wholesaler"} • SKU: {product.supplierSku || product.id}
+                    </div>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-black text-[9px] uppercase tracking-wider">
+                  Verified Stock
+                </span>
+              </div>
+
               {/* Color Options */}
               {product.colors && (
                 <div className="pt-2">
@@ -439,21 +457,43 @@ export const ProductDetailModal: React.FC<Props> = ({
                   )}
 
                   {activeTab === "Shipping" && (
-                    <div className="space-y-2">
-                      <div className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                        <span>Cape Town &amp; Local Metro: 2 to 4 working days</span>
+                    <div className="space-y-2.5">
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60">
+                          <div className="font-extrabold text-[#0A3D62] dark:text-[#F9CA24]">Local Cape Town</div>
+                          <div className="font-black text-sm text-emerald-600 dark:text-emerald-400">R85</div>
+                          <div className="text-[10px] opacity-75">2 to 3 working days</div>
+                        </div>
+                        <div className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60">
+                          <div className="font-extrabold text-[#0A3D62] dark:text-[#F9CA24]">National Main Centers</div>
+                          <div className="font-black text-sm text-[#0A3D62] dark:text-[#F9CA24]">R145</div>
+                          <div className="text-[10px] opacity-75">JHB, DBN, PTA (3-4 days)</div>
+                        </div>
+                        <div className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60">
+                          <div className="font-extrabold text-[#0A3D62] dark:text-[#F9CA24]">Regional &amp; Outlying</div>
+                          <div className="font-black text-sm text-purple-600 dark:text-purple-400">R175</div>
+                          <div className="text-[10px] opacity-75">Non-metro (3-5 days)</div>
+                        </div>
+                        <div className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60">
+                          <div className="font-extrabold text-[#0A3D62] dark:text-[#F9CA24]">Priority Overnight</div>
+                          <div className="font-black text-sm text-rose-600 dark:text-rose-400">R195</div>
+                          <div className="text-[10px] opacity-75">Next business day</div>
+                        </div>
                       </div>
-                      <p className="text-[11px] opacity-80 pl-3.5">
-                        Every product comes to our Cape Town hub first for manual quality inspection and protective heat-safe repacking before courier handover. Due to this dedicated repacking process, same-day delivery cannot be guaranteed at this stage.
+
+                      <div className="p-2.5 rounded-xl border border-amber-200 dark:border-amber-900/40 bg-amber-50/60 dark:bg-amber-950/20 text-xs">
+                        <div className="flex justify-between items-center">
+                          <span className="font-extrabold text-[#0A3D62] dark:text-[#F9CA24]">International Courier (DHL Express)</span>
+                          <span className="font-black text-sm text-amber-600 dark:text-amber-400">R495</span>
+                        </div>
+                        <p className="text-[10px] opacity-80 mt-0.5">
+                          Door-to-door worldwide shipping with international tracking (4 to 7 working days).
+                        </p>
+                      </div>
+
+                      <p className="text-[11px] opacity-80 leading-relaxed">
+                        Every product comes to our Cape Town hub first for manual quality inspection and protective heat-safe repacking before courier handover. Automated The Courier Guy tracking waybill and live WhatsApp updates dispatched directly to your mobile phone.
                       </p>
-                      <div className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 pt-1">
-                        <span className="w-2 h-2 rounded-full bg-amber-500" />
-                        <span>Johannesburg, Pretoria, Durban &amp; Regional: 3 to 5 working days</span>
-                      </div>
-                      <div className="text-[11px] opacity-80 pl-3.5">
-                        Automated The Courier Guy tracking waybill and live WhatsApp updates dispatched directly to your mobile phone.
-                      </div>
                     </div>
                   )}
 

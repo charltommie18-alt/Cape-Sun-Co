@@ -262,10 +262,10 @@ app.post("/api/ai/chat", async (req: Request, res: Response) => {
 Cape Sun Co is South Africa's premier summer essentials brand, locally stocked in Cape Town.
 
 Our core summer essentials:
-1. Bladeless Neck Fan 4000mAh (R299, was R399) - Hands-free, safe for braids, weaves, kids, 8-hour battery, 3 speeds + LED display, USB-C fast charging, lightweight 260g. Tested in 38°C+ Oudtshoorn and taxi rank heat.
-2. Kids UPF 50+ Sunsuit + Instant Ice Cooling Towel Bundle (R449, was R599) - Blocks 98% UV, SABS approved, chlorine & saltwater resistant, cooling towel drops skin temp by 8-15°C in 3 seconds with just water. Sizes 0-6M, 6-12M, 1-2Y, 2-3Y, 3-4Y.
-3. Instant Ice Cooling Towel (R129, was R199) - PVA mesh, soak, wring, snap. Lasts 4 hours per soak. Anti-bacterial, includes carry pouch.
-4. 20000mAh Solar Power Bank with 4 Built-in Cables (R599, was R799) - 5 full phone charges off-grid, solar panel 5V/300mA, Type-C, Lightning, Micro, USB, 22.5W fast charge, dual LED emergency torch. Built for Cederberg camping, festivals, beach braais, and outdoor backup power.
+1. Rechargeable Hands-Free Neck Fan 3-Speed (R199, was R299) - Hands-free, safe for braids, weaves, kids, 4-8 hour battery, 3 speeds, USB fast charging, lightweight 220g. Sourced from Perfect Dealz SA / Bob Shop.
+2. Kids UPF 50+ Sunsuit + Instant Ice Cooling Towel Bundle (R299, was R449) - Blocks 98.5% UV, SABS approved, chlorine & saltwater resistant, cooling towel drops skin temp by 8-15°C in 3 seconds. Sizes 0-6M to 3-4Y.
+3. Instant Ice Cooling Towel (R99, was R149) - PVA hyper-evaporative mesh, soak, wring, snap. Drops to 15°C below ambient in 3 seconds. Anti-bacterial, includes aerated canister bottle.
+4. X28 Sovo Solar 20000mAh Power Bank with 4 Built-In Cables & Dual Torch (R389, was R699) - Sourced from Bob Shop / Super Electronics as the closest and cheapest high-capacity unit in SA. 20,000mAh capacity, 4 integrated wires (Type-C, iPhone Lightning, Micro-USB, USB-A), digital LED % display, solar trickle panel, and twin high-lumen flashlights. Perfect for Cederberg camping, loadshedding backup, and outdoor adventures.
 
 - Special Offers & Guarantees:
 - "Build Your Summer Kit" Bundle: Buy 2 or more products and save R150 instantly!
@@ -309,17 +309,17 @@ SunBot:`;
     let reply = `Howzit ${userSession.userName ? userSession.userName : ""}! Welcome to Cape Sun Co in Cape Town. How can I assist you with your summer kit today?`;
 
     if (lower.includes("neck fan") || lower.includes("braid") || lower.includes("fan") || lower.includes("hair") || lower.includes("battery")) {
-      reply = "Our Bladeless Neck Fan 4000mAh (R299, was R399) is our #1 summer best-seller! Because it's completely bladeless, it is 100% safe for braids, weaves, hijabs, and little ones. The 4000mAh battery delivers up to 8 hours on low speed and charges in just 2 hours via USB-C. Plus, you get Free 2-3 Day local Cape Town delivery!";
+      reply = "Our USB Rechargeable Hands-Free Neck Fan 3-Speed (R199, was R299) is our #1 summer best-seller! Sourced from Perfect Dealz / Bob Shop as the closest and cheapest option in SA, it is 100% braid and weave safe. The rechargeable battery delivers 4-8 hours of runtime and recharges in ~1.5 hours via USB. Plus, you get Free 2-3 Day local Cape Town delivery!";
     } else if (lower.includes("sunsuit") || lower.includes("kid") || lower.includes("baby") || lower.includes("toddler") || lower.includes("size") || lower.includes("upf")) {
-      reply = "The Kids UPF 50+ Sunsuit + Cooling Towel Bundle (R449, was R599) is SABS approved and blocks 98% of harmful UV rays. Available in sizes 0-6M, 6-12M, 1-2Y, 2-3Y, and 3-4Y. It comes with our instant ice cooling towel that drops temperature by 8°C in 3 seconds. Perfect for Clifton and Muizenberg beach days!";
-    } else if (lower.includes("power bank") || lower.includes("solar") || lower.includes("cables") || lower.includes("camp") || lower.includes("festival") || lower.includes("power")) {
-      reply = "The 20000mAh Solar Power Bank (R599, was R799) is an absolute must-have for camping in Cederberg, summer festivals, and portable backup power. It features 4 built-in cables (Type-C, Lightning, Micro-USB, USB-A), a built-in solar panel for emergency off-grid top-ups, and a bright dual LED torch!";
+      reply = "The Kids UPF 50+ Sunsuit + Cooling Towel Bundle (R299, was R449) is SABS approved and blocks 98.5% of harmful UV rays. Available in sizes 0-6M, 6-12M, 1-2Y, 2-3Y, and 3-4Y. It comes with our instant ice cooling towel that drops temperature by 8°C in 3 seconds. Perfect for Clifton and Muizenberg beach days!";
+    } else if (lower.includes("power bank") || lower.includes("solar") || lower.includes("cables") || lower.includes("camp") || lower.includes("festival") || lower.includes("power") || lower.includes("sovo") || lower.includes("x28")) {
+      reply = "The X28 Sovo Solar Powered 20000mAh Power Bank (R389, was R699) is the closest and cheapest high-capacity solar bank on Bob Shop! It packs 20,000mAh, 4 built-in cables (Type-C, iPhone Lightning, Micro-USB, USB-A), a solar trickle panel, precision LED % display, and twin LED torches. Essential for Cederberg camping and loadshedding!";
     } else if (lower.includes("cooling towel") || lower.includes("towel") || lower.includes("ice") || lower.includes("cold")) {
-      reply = "Our Instant Ice Cooling Towel (R129, was R199) uses PVA evaporative mesh technology. Simply soak in any water, wring it out, and snap it. It cools down to 15°C below ambient in 3 seconds and stays chilled for up to 4 hours! Ideal for gym, running, site work, or taxi commutes.";
+      reply = "Our Instant Ice Cooling Towel (R99, was R149) uses PVA evaporative mesh technology. Sourced via Bob Shop at R45 wholesale. Simply soak in any water, wring it out, and snap it. It cools down to 15°C below ambient in 3 seconds and stays chilled for up to 4 hours!";
     } else if (lower.includes("capitec") || lower.includes("pay") || lower.includes("ozow") || lower.includes("payment")) {
       reply = "We offer 1-click Capitec Pay! Just select Capitec Pay at checkout, enter your phone or ID, and approve the push notification in your Capitec Banking app. Zero card fees and instant confirmation! We also support Ozow Instant EFT, PayJustNow (pay in 3 interest-free slices), and Visa/Mastercard.";
-    } else if (lower.includes("deliver") || lower.includes("shipping") || lower.includes("cape town") || lower.includes("time") || lower.includes("jhb") || lower.includes("speed")) {
-      reply = "We dispatch directly from our Cape Town warehouse. Local Cape Town delivery is 2 to 3 days (FREE). Deliveries to Johannesburg, Pretoria, Durban, and regional areas take longer (3 to 5 business days). You receive instant WhatsApp order confirmation and dispatch tracking updates!";
+    } else if (lower.includes("deliver") || lower.includes("shipping") || lower.includes("cape town") || lower.includes("time") || lower.includes("jhb") || lower.includes("speed") || lower.includes("rate") || lower.includes("courier")) {
+      reply = "We dispatch directly from our Cape Town warehouse via The Courier Guy. Local Cape Town courier is 2 to 3 days (R85). Deliveries to Johannesburg, Pretoria, Durban, and national main centers take 3 to 4 business days (R145), Regional SA is R175, Express Priority Overnight is R195, and International Courier is R495. Clients receive automated WhatsApp order confirmation and courier tracking waybills!";
     } else if (lower.includes("return") || lower.includes("warranty") || lower.includes("guarantee")) {
       reply = "We stand by our quality 100%! You receive a 30-Day hassle-free money-back guarantee and complete local South African quality testing. If anything isn't 100% right, our Cape Town support team on WhatsApp (+27 66 286 0184) handles it immediately.";
     } else if (lower.includes("whatsapp") || lower.includes("receipt") || lower.includes("confirmation")) {
@@ -327,11 +327,11 @@ SunBot:`;
     } else if (lower.includes("recommend") || lower.includes("bundle") || lower.includes("suggest") || lower.includes("deal") || lower.includes("profile") || lower.includes("personalized")) {
       const interests: string[] = userSession.interests || [];
       if (interests.some(i => i.toLowerCase().includes("kid") || i.toLowerCase().includes("baby"))) {
-        reply = `Based on your profile preference for kid & toddler summer safety, we strongly recommend the Kids UPF 50+ Sunsuit + Instant Cooling Towel bundle (R449). It provides 98% UV protection and instantaneous 3-second cooling.`;
+        reply = `Based on your profile preference for kid & toddler summer safety, we strongly recommend the Kids UPF 50+ Sunsuit + Instant Cooling Towel bundle (R299). It provides 98.5% UV protection and instantaneous 3-second cooling.`;
       } else if (interests.some(i => i.toLowerCase().includes("camp") || i.toLowerCase().includes("power") || i.toLowerCase().includes("solar"))) {
-        reply = `Based on your off-grid camping and backup power interests, our 20000mAh Solar Power Bank with 4 built-in cables (R599) and dual LED torch will keep your setup powered anywhere in SA!`;
+        reply = `Based on your off-grid camping and backup power interests, the X28 Sovo Solar 20000mAh Power Bank (R389, was R699) with 4 built-in cables and twin torch will keep your gear charged anywhere in SA!`;
       } else {
-        reply = `Based on your interest in ${interests.length > 0 ? interests[0] : "beating the summer heat"} in ${userSession.climateZone || "Cape Town"}, we recommend pairing the Bladeless Neck Fan with our Instant Cooling Towel for the ultimate R150 bundle discount!`;
+        reply = `Based on your interest in ${interests.length > 0 ? interests[0] : "beating the summer heat"} in ${userSession.climateZone || "Cape Town"}, we recommend pairing the Rechargeable Neck Fan with our Instant Cooling Towel for the ultimate R150 bundle discount!`;
       }
     }
 
@@ -378,10 +378,10 @@ Personalize product recommendations using this customer's profile:
 - Current Cart: ${JSON.stringify(cartItems)}
 
 Available Products:
-1. neckfan (Bladeless Neck Fan 4000mAh, R299) - Braid safe, 3 speeds, 8hr battery, high heat relief
-2. uvbundle (Kids UPF 50+ Sunsuit + Cooling Towel Bundle, R449) - SABS certified, 98% UV block, 3s ice towel
-3. towel (Instant Ice Cooling Towel, R129) - PVA evaporative, drops 15°C in 3 seconds, under R150
-4. powerbank (20000mAh Solar Power Bank 4 Cables, R599) - Solar panel, 4 built-in cables, dual LED torch
+1. neckfan (Rechargeable Neck Fan 3-Speed, R199 - Sourced from Perfect Dealz / Bob Shop) - Braid safe, 3 speeds, 8hr battery, high heat relief
+2. uvbundle (Kids UPF 50+ Sunsuit + Cooling Towel Bundle, R299) - SABS certified, 98% UV block, 3s ice towel
+3. towel (Instant Ice Cooling Towel, R99 - Sourced from Bob Shop) - PVA evaporative, drops 15°C in 3 seconds, under R100
+4. powerbank (Solar Power Bank & Emergency Torch, R389 - Sourced from Perfect Dealz / Bob Shop) - Solar panel, 4 built-in cables, dual LED torch
 
 Task: Output a JSON array of 2 to 3 recommended products with id, headline, reason (specifically referencing their interests/preferences/history and South African summer conditions), and urgencyTag.
 Example format:
@@ -1131,6 +1131,362 @@ app.post("/api/orders/send-customer-update", (req: Request, res: Response) => {
     message,
     waUrl,
   });
+});
+
+// ==========================================
+// SOURCED PRODUCTS & INVENTORY MANAGEMENT
+// Sourced from verified suppliers (Bob Shop, Perfect Dealz SA & Local Wholesalers)
+// ==========================================
+interface SourcedProductRecord {
+  id: string;
+  title: string;
+  shortTitle: string;
+  subtitle?: string;
+  price: number;
+  compare: number;
+  badge: string;
+  stock: number;
+  rating: number;
+  reviewsCount: number;
+  colors: string[];
+  sizes?: string[];
+  paystack: string;
+  desc: string;
+  specs: string[];
+  emoji: string;
+  image: string;
+  images: string[];
+  seo: string;
+  category: "cooling" | "sun-protection" | "power";
+  videoUrl?: string;
+  videoTitle?: string;
+  videoType?: "mp4" | "youtube";
+  videoDuration?: string;
+  supplierName: string;
+  supplierUrl?: string;
+  supplierCostPrice: number;
+  supplierSku?: string;
+  profitMargin: number;
+  profitMarginPercent: number;
+}
+
+const DEFAULT_SOURCED_PRODUCTS: SourcedProductRecord[] = [
+  {
+    id: "neckfan",
+    title: "USB Rechargeable Hands-Free Hanging Neck Fan (3-Speed Dual Turbine)",
+    shortTitle: "Rechargeable Neck Fan (3-Speed)",
+    subtitle: "Hands-free 360° airflow, braid-safe & rechargeable whisper-quiet cooling",
+    price: 199,
+    compare: 299,
+    badge: "Closest & Cheapest Sourced",
+    stock: 24,
+    rating: 4.9,
+    reviewsCount: 428,
+    colors: ["Arctic White", "Ocean Blue", "Midnight Black"],
+    paystack: "#PAYSTACK_LINK_NECKFAN",
+    supplierName: "Perfect Dealz SA / Bob Shop Sourced",
+    supplierUrl: "https://perfectdealz.co.za",
+    supplierCostPrice: 99,
+    supplierSku: "PD-NF-01",
+    profitMargin: 100,
+    profitMarginPercent: 50.3,
+    desc: "The most affordable and accessible South African sourced hands-free cooling solution. Sourced directly via verified local distributors (Perfect Dealz / Bob Shop). Features dual adjustable turbine heads with 3 wind speeds (Gentle, Natural, Strong), 360-degree flexible silicone neck arm for custom positioning, and 100% braid & weave safety. Equipped with a high-efficiency USB-rechargeable lithium cell delivering 4 to 8 hours of continuous heat relief. Perfect for taxi ranks, Clifton beach, work commutes, and Cape Town summer heatwaves.",
+    specs: [
+      "Supplier Source: Perfect Dealz SA / Bob Shop (Verified SA Stock)",
+      "Wholesale Cost: R99.00 | Direct Profit: +R100.00/unit (50.3% Margin)",
+      "Battery: USB Rechargeable Lithium Cell (4h - 8h runtime)",
+      "Speed Modes: 3 Airflow Levels (Low Gentle, Mid Natural, High Blast)",
+      "Design: 360° Flexible Silicone Neckband with Dual Multi-Vent Turbines",
+      "Safety: 100% Bladeless & braid-safe - no snagging on curls or weaves",
+      "Charging: 5V USB fast charging (recharges in ~1.5 to 2 hours)",
+      "Weight & Ergonomics: Ultra-light 220g sports profile with flexible comfort band",
+    ],
+    emoji: "🌀",
+    image: "/src/assets/images/neck_fan_photo_1789945517379.jpg",
+    images: [
+      "/src/assets/images/neck_fan_photo_1789945517379.jpg",
+      "/src/assets/images/neck_fan_lifestyle_1789945565435.jpg",
+      "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80",
+    ],
+    seo: "Rechargeable Neck Fan South Africa - Hands Free Personal Fan for Cape Town Summer",
+    category: "cooling",
+    videoUrl: "/videos/neckfan_demo.mp4",
+    videoTitle: "Rechargeable Neck Fan Airflow & Noise Test",
+    videoType: "mp4",
+    videoDuration: "0:15 Demo",
+  },
+  {
+    id: "uvbundle",
+    title: "Kids UPF 50+ Sun Protection Swimsuit & Instant Ice Towel Set",
+    shortTitle: "Kids UPF 50+ Sunsuit + Cooling Towel",
+    subtitle: "Certified UPF 50+ UV swimwear with 3-second instant ice cooling towel",
+    price: 299,
+    compare: 449,
+    badge: "Mom Favourite",
+    stock: 14,
+    rating: 4.8,
+    reviewsCount: 312,
+    colors: ["Ocean Blue", "Coral Reef", "Sunny Yellow"],
+    sizes: ["0-6M", "6-12M", "1-2Y", "2-3Y", "3-4Y"],
+    paystack: "#PAYSTACK_LINK_UVBUNDLE",
+    supplierName: "Local SA Wholesaler & Bob Shop",
+    supplierUrl: "https://www.bobshop.co.za",
+    supplierCostPrice: 149,
+    supplierSku: "BS-UV-KIDS",
+    profitMargin: 150,
+    profitMarginPercent: 50.2,
+    desc: "Complete sun safety and heatstroke defense for sunny beach trips to Clifton, Camps Bay, and Muizenberg. Crafted from certified high-density UPF 50+ Italian lycra blend that physically blocks 98.5% of harmful UVA and UVB radiation, eliminating constant sunscreen reapplication battles. Features a smooth front anti-pinch zipper with an inner protective flap and chin guard for painless dressing. Chlorine and saltwater resistant with 4-way stretch that allows uninhibited play. Bundled with our medical-grade evaporative cooling towel that drops temperature by 8°C–12°C in 3 seconds to soothe flushed toddlers instantly.",
+    specs: [
+      "Supplier Source: Local Wholesaler & Bob Shop Catalog",
+      "Wholesale Cost: R149.00 | Direct Profit: +R150.00/unit (50.2% Margin)",
+      "Sun Protection: SABS tested UPF 50+ rating (blocks 98.5% UVA/UVB)",
+      "Material: 82% quick-dry nylon, 18% spandex composite with 4-way stretch",
+      "Comfort: Deep front anti-pinch zip with protective chin guard",
+      "Durability: Chlorine, saltwater & sunscreen cream resistant",
+      "Cooling Towel: Included PVA evaporative snap-chill towel (30x80cm)",
+      "Care: Machine washable, quick drying & anti-chafing flatlock seams",
+    ],
+    emoji: "👶",
+    image: "/src/assets/images/kids_sunsuit_photo_1789945528754.jpg",
+    images: [
+      "/src/assets/images/kids_sunsuit_photo_1789945528754.jpg",
+      "/src/assets/images/cooling_towel_photo_1789945539988.jpg",
+      "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+    ],
+    seo: "Kids UPF 50+ Sunsuit South Africa - UV Protection Baby Swim Suit",
+    category: "sun-protection",
+    videoUrl: "/videos/sunsuit_demo.mp4",
+    videoTitle: "Kids UPF 50+ Sunsuit Stretch & Cooling Towel Activation Demo",
+    videoType: "mp4",
+    videoDuration: "0:15 Demo",
+  },
+  {
+    id: "towel",
+    title: "Instant Evaporative Ice Cooling Towel (100cm × 30cm) with Carry Bottle",
+    shortTitle: "Instant Ice Cooling Towel",
+    subtitle: "Soak, wring, snap — drops skin temperature to 15°C in 3 seconds",
+    price: 99,
+    compare: 149,
+    badge: "Under R100 Best Deal",
+    stock: 45,
+    rating: 4.8,
+    reviewsCount: 891,
+    colors: ["Aqua Blue", "Lime Green", "Charcoal Gray", "Coral Pink"],
+    paystack: "#PAYSTACK_LINK_TOWEL",
+    supplierName: "Bob Shop SA / Wholesale Direct",
+    supplierUrl: "https://www.bobshop.co.za",
+    supplierCostPrice: 45,
+    supplierSku: "BS-ICE-02",
+    profitMargin: 54,
+    profitMarginPercent: 54.5,
+    desc: "Immediate physical heat relief engineered for Sea Point promenade runs, gym workouts, sunny braais, Lion's Head hikes, and beach days. Sourced from Bob Shop & local Cape distributors at the lowest price point in SA. Uses high-density hyper-evaporative honeycomb mesh fabric that draws moisture away from the skin and uses evaporative cooling physics to drop surface temperature to 15°C below ambient without chemicals, gels, or refrigeration. Re-activates in seconds: simply re-wet, wring out, and snap 3 times. Generous 100cm × 30cm length provides comprehensive neck and shoulder coverage. Includes a waterproof travel canister with aeration holes and carabiner clip.",
+    specs: [
+      "Supplier Source: Bob Shop SA Direct Inventory",
+      "Wholesale Cost: R45.00 | Direct Profit: +R54.00/unit (54.5% Margin)",
+      "Thermal Drop: Cools 15°C below ambient in 3 seconds via evaporative physics",
+      "Duration: Sustained cooling for up to 3-4 hours per soak",
+      "Dimensions: 100cm × 30cm full neck & shoulder wrap span",
+      "Composition: 100% chemical-free hyper-evaporative microfibre mesh",
+      "Hygiene: Anti-microbial, anti-odor & UPF 50 sun barrier",
+      "Packaging: Aerated canister with sturdy carabiner clip included",
+    ],
+    emoji: "🧊",
+    image: "/src/assets/images/cooling_towel_photo_1789945539988.jpg",
+    images: [
+      "/src/assets/images/cooling_towel_photo_1789945539988.jpg",
+      "/src/assets/images/neck_fan_lifestyle_1789945565435.jpg",
+      "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=800&q=80",
+    ],
+    seo: "Instant Cooling Towel South Africa - Ice Towel for Heat Relief",
+    category: "cooling",
+    videoUrl: "/videos/towel_demo.mp4",
+    videoTitle: "Instant Ice Cooling Towel 3-Second Snap & Chill Test",
+    videoType: "mp4",
+    videoDuration: "0:15 Demo",
+  },
+  {
+    id: "powerbank",
+    title: "X28 Sovo Solar Powered 20000mAh Power Bank with 4 Built-In Cables & Dual Torch",
+    shortTitle: "X28 Sovo Solar 20000mAh Power Bank",
+    subtitle: "20,000mAh solar emergency power bank, 4 integrated cables, LED % display & dual torch",
+    price: 389,
+    compare: 699,
+    badge: "Closest & Cheapest Sourced",
+    stock: 18,
+    rating: 4.8,
+    reviewsCount: 203,
+    colors: ["Matte Black", "Tactical Blue"],
+    paystack: "#PAYSTACK_LINK_POWERBANK",
+    supplierName: "Bob Shop SA / Super Electronics (Listing: X28 Sovo Solar 20000mAh)",
+    supplierUrl: "https://www.bobshop.co.za",
+    supplierCostPrice: 260,
+    supplierSku: "BS-SOVO-X28",
+    profitMargin: 129,
+    profitMarginPercent: 49.6,
+    desc: "The closest and cheapest high-capacity solar emergency power station found on Bob Shop (Super Electronics Johannesburg inventory). Packs an authentic 20,000mAh high-density polymer lithium battery capable of delivering 4 to 6 full phone charges off-grid. Never misplace or pack messy cables again: features 4 integrated tangle-free reinforced cables (Type-C, iPhone Lightning, Micro-USB, and USB-A recharge cable) plus dual USB output ports and Type-C / Micro input ports. An integrated monocrystalline solar panel allows outdoor emergency trickle charging under direct sunlight. Equipped with a digital LED battery percentage readout (0-100%) and twin high-power LED flashlights with Steady, Strobe, and SOS emergency signals for Cederberg camping, loadshedding backup, and outdoor adventures.",
+    specs: [
+      "Supplier Source: Bob Shop SA / Super Electronics (Listing: X28 Sovo Solar 20000mAh)",
+      "Wholesale Listing Cost: R260.00 | Direct Profit: +R129.00/unit (49.6% Margin)",
+      "Battery Capacity: 20,000mAh high-density Li-Polymer cell",
+      "Integrated 4-Cables: USB-C, Lightning (Apple), Micro-USB, and USB-A recharge",
+      "Digital Display: Precision LED battery percentage indicator (0% to 100%)",
+      "Solar Trickle: High-efficiency monocrystalline solar panel for emergency charging",
+      "Dual Lighting: Twin high-lumen emergency LED spotlights with Steady, SOS & Strobe",
+      "Multi-Device Charging: Charges up to 5 devices simultaneously via cables and dual USB ports",
+      "Rugged Shell: Shock-absorbing ABS+PC casing with corner bumper protection & lanyard loop",
+    ],
+    emoji: "🔋",
+    image: "/src/assets/images/solar_powerbank_photo_1789945551692.jpg",
+    images: [
+      "/src/assets/images/solar_powerbank_photo_1789945551692.jpg",
+      "/src/assets/images/camping_solar_lifestyle_1789945576074.jpg",
+      "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80",
+    ],
+    seo: "X28 Sovo Solar Power Bank 20000mAh South Africa - Bob Shop Closest & Cheapest Fast Charge Powerbank",
+    category: "power",
+    videoUrl: "/videos/powerbank_demo.mp4",
+    videoTitle: "X28 Sovo Solar Power Bank 4-Cable Fast Charging & Flashlight Test",
+    videoType: "mp4",
+    videoDuration: "0:15 Demo",
+  },
+];
+
+let productsCatalog: SourcedProductRecord[] = [...DEFAULT_SOURCED_PRODUCTS];
+
+// GET: All active products in catalog
+app.get("/api/products", (req: Request, res: Response) => {
+  res.json({
+    products: productsCatalog,
+    totalCount: productsCatalog.length,
+    sourcingSuppliers: [
+      { name: "Bob Shop SA", url: "https://www.bobshop.co.za", status: "Verified Active" },
+      { name: "Perfect Dealz SA", url: "https://perfectdealz.co.za", status: "Verified Active" },
+      { name: "Cape Town Local Wholesalers", url: "https://thecourierguy.co.za", status: "Verified Active" },
+    ],
+  });
+});
+
+// POST: Add a new sourced product
+app.post("/api/products", (req: Request, res: Response) => {
+  const {
+    title,
+    shortTitle,
+    subtitle,
+    price,
+    compare,
+    supplierCostPrice,
+    supplierName,
+    supplierUrl,
+    supplierSku,
+    stock = 10,
+    category = "cooling",
+    desc,
+    specs = [],
+    emoji = "📦",
+    image,
+    colors = ["Standard"],
+    badge = "New Deal",
+  } = req.body;
+
+  if (!title || !price) {
+    return res.status(400).json({ error: "Product title and retail price are required" });
+  }
+
+  const numPrice = Number(price);
+  const numCost = Number(supplierCostPrice) || Math.round(numPrice * 0.5);
+  const profitMargin = Math.max(0, numPrice - numCost);
+  const profitMarginPercent = numPrice > 0 ? Number(((profitMargin / numPrice) * 100).toFixed(1)) : 0;
+
+  const newProd: SourcedProductRecord = {
+    id: `prod-${Date.now()}`,
+    title: title.trim(),
+    shortTitle: (shortTitle || title.slice(0, 28)).trim(),
+    subtitle: subtitle || "Verified South African Sourced Inventory",
+    price: numPrice,
+    compare: Number(compare) || Math.round(numPrice * 1.4),
+    badge,
+    stock: Number(stock) || 10,
+    rating: 4.8,
+    reviewsCount: 1,
+    colors: Array.isArray(colors) && colors.length > 0 ? colors : ["Default"],
+    paystack: "#PAYSTACK_LINK_CUSTOM",
+    desc: desc || `Authentic summer product sourced locally through ${supplierName || "Bob Shop / Perfect Dealz"}. Quality inspected and repacked at our Cape Town hub.`,
+    specs: Array.isArray(specs) && specs.length > 0
+      ? specs
+      : [
+          `Supplier Source: ${supplierName || "Verified SA Supplier"}`,
+          `Wholesale Cost: R${numCost}.00 | Profit: +R${profitMargin}.00/unit (${profitMarginPercent}% Margin)`,
+          "Cape Town Repacked & Checked Before Courier Dispatch",
+        ],
+    emoji,
+    image: image || "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=800&q=80",
+    images: [
+      image || "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=800&q=80",
+    ],
+    seo: `${title} South Africa - Best Price Cape Town Store`,
+    category,
+    supplierName: supplierName || "Bob Shop SA",
+    supplierUrl: supplierUrl || "https://www.bobshop.co.za",
+    supplierCostPrice: numCost,
+    supplierSku: supplierSku || `SKU-${Date.now().toString().slice(-5)}`,
+    profitMargin,
+    profitMarginPercent,
+  };
+
+  productsCatalog.unshift(newProd);
+  res.status(201).json({ success: true, product: newProd, message: "Product added to store catalog successfully." });
+});
+
+// PUT: Update an existing product
+app.put("/api/products/:id", (req: Request, res: Response) => {
+  const { id } = req.params;
+  const index = productsCatalog.findIndex((p) => p.id === id);
+  if (index === -1) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+
+  const existing = productsCatalog[index];
+  const body = req.body;
+
+  const numPrice = body.price !== undefined ? Number(body.price) : existing.price;
+  const numCost = body.supplierCostPrice !== undefined ? Number(body.supplierCostPrice) : existing.supplierCostPrice;
+  const profitMargin = Math.max(0, numPrice - numCost);
+  const profitMarginPercent = numPrice > 0 ? Number(((profitMargin / numPrice) * 100).toFixed(1)) : 0;
+
+  const updated: SourcedProductRecord = {
+    ...existing,
+    ...body,
+    price: numPrice,
+    compare: body.compare !== undefined ? Number(body.compare) : existing.compare,
+    supplierCostPrice: numCost,
+    stock: body.stock !== undefined ? Number(body.stock) : existing.stock,
+    profitMargin,
+    profitMarginPercent,
+  };
+
+  productsCatalog[index] = updated;
+  res.json({ success: true, product: updated, message: "Product updated successfully." });
+});
+
+// DELETE: Remove product from catalog
+app.delete("/api/products/:id", (req: Request, res: Response) => {
+  const { id } = req.params;
+  const countBefore = productsCatalog.length;
+  productsCatalog = productsCatalog.filter((p) => p.id !== id);
+  if (productsCatalog.length === countBefore) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+  res.json({ success: true, message: "Product removed from catalog." });
+});
+
+// POST: Reset products to verified default supplier list
+app.post("/api/products/reset", (req: Request, res: Response) => {
+  productsCatalog = [...DEFAULT_SOURCED_PRODUCTS];
+  res.json({ success: true, products: productsCatalog, message: "Catalog reset to verified supplier defaults." });
 });
 
 // ==========================================

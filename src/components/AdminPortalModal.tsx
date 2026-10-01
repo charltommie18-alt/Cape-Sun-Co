@@ -25,8 +25,17 @@ import {
   Send,
   Sparkles,
   BarChart3,
+  MessageCircle,
+  Phone,
+  Package,
+  DollarSign,
+  Calculator,
+  Tag,
+  ArrowUpRight,
+  TrendingUp,
 } from "lucide-react";
-import { UserProfile, PromotionalSubscriber } from "../types";
+import { UserProfile, PromotionalSubscriber, Product } from "../types";
+import { PRODUCTS } from "../data/products";
 import { DailyReportsView } from "./DailyReportsView";
 import { CloudStorageView } from "./CloudStorageView";
 import { AnalyticsDashboard } from "./AnalyticsDashboard";
@@ -57,8 +66,24 @@ export const AdminPortalModal: React.FC<Props> = ({
 
   // Active admin tab
   const [activeTab, setActiveTab] = useState<
-    "clients" | "promotions" | "analytics" | "reports" | "storage" | "orders" | "safeguards"
-  >("clients");
+    "suppliers" | "clients" | "promotions" | "analytics" | "reports" | "storage" | "orders" | "safeguards"
+  >("suppliers");
+
+  // Suppliers & Sourcing State
+  const [sourcingProducts, setSourcingProducts] = useState<Product[]>(PRODUCTS);
+  const [sourcingLoading, setSourcingLoading] = useState(false);
+  const [selectedSupplierFilter, setSelectedSupplierFilter] = useState<string>("all");
+  const [sourcingSearch, setSourcingSearch] = useState("");
+  const [calcUnits, setCalcUnits] = useState<{ [productId: string]: number }>({
+    neckfan: 20,
+    uvbundle: 10,
+    towel: 30,
+    powerbank: 15,
+  });
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [editCostPrice, setEditCostPrice] = useState<number>(0);
+  const [editRetailPrice, setEditRetailPrice] = useState<number>(0);
+  const [sourcingMessage, setSourcingMessage] = useState<string>("");
 
   // Client Switcher State
   const [clients, setClients] = useState<any[]>([]);
@@ -80,12 +105,14 @@ export const AdminPortalModal: React.FC<Props> = ({
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [dispatchUpdating, setDispatchUpdating] = useState<string | null>(null);
+  const [copiedOrderPhone, setCopiedOrderPhone] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen && isAuthenticated) {
       fetchClients();
       fetchSubscribers();
       fetchOrders();
+      fetchSourcingProducts();
     }
   }, [isOpen, isAuthenticated]);
 
@@ -212,6 +239,73 @@ export const AdminPortalModal: React.FC<Props> = ({
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const fetchSourcingProducts = async () => {
+    setSourcingLoading(true);
+    try {
+      const resp = await fetch("/api/products");
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.products && Array.isArray(data.products) && data.products.length > 0) {
+          setSourcingProducts(data.products);
+          return;
+        }
+      }
+      setSourcingProducts(PRODUCTS);
+    } catch (err) {
+      setSourcingProducts(PRODUCTS);
+    } finally {
+      setSourcingLoading(false);
+    }
+  };
+
+  const handleStartPriceEdit = (p: Product) => {
+    setEditingProductId(p.id);
+    setEditRetailPrice(p.price);
+    setEditCostPrice(p.supplierCostPrice || Math.round(p.price * 0.5));
+  };
+
+  const handleSavePriceEdit = async (id: string) => {
+    try {
+      const resp = await fetch(`/api/products/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          price: editRetailPrice,
+          supplierCostPrice: editCostPrice,
+        }),
+      });
+      if (resp.ok) {
+        setSourcingMessage("Sourcing pricing updated successfully!");
+        fetchSourcingProducts();
+        setTimeout(() => setSourcingMessage(""), 3500);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setEditingProductId(null);
+    }
+  };
+
+  const handleResetSourcing = async () => {
+    try {
+      const resp = await fetch("/api/products/reset", { method: "POST" });
+      if (resp.ok) {
+        setSourcingMessage("Reset to verified Bob Shop & Perfect Dealz defaults!");
+        fetchSourcingProducts();
+        setTimeout(() => setSourcingMessage(""), 3500);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUpdateCalcUnit = (productId: string, qty: number) => {
+    setCalcUnits((prev) => ({
+      ...prev,
+      [productId]: Math.max(1, qty),
+    }));
   };
 
   const handleUpdateOrderStatus = async (orderCode: string, newStatus: string) => {
@@ -407,6 +501,18 @@ export const AdminPortalModal: React.FC<Props> = ({
               }`}
             >
               <button
+                onClick={() => setActiveTab("suppliers")}
+                className={`px-3 py-2 rounded-xl transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                  activeTab === "suppliers"
+                    ? "bg-[#0A3D62] text-white dark:bg-[#F9CA24] dark:text-black font-black"
+                    : "hover:bg-slate-100 dark:hover:bg-slate-800 opacity-80"
+                }`}
+              >
+                <Package size={14} />
+                <span>Suppliers &amp; Closest Sourcing ({sourcingProducts.length})</span>
+              </button>
+
+              <button
                 onClick={() => setActiveTab("clients")}
                 className={`px-3 py-2 rounded-xl transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                   activeTab === "clients"
@@ -439,7 +545,7 @@ export const AdminPortalModal: React.FC<Props> = ({
                 }`}
               >
                 <Truck size={14} />
-                <span>Courier Dispatch Console ({orders.length})</span>
+                <span>Courier &amp; WhatsApp Dispatch ({orders.length})</span>
               </button>
 
               <button
@@ -493,6 +599,412 @@ export const AdminPortalModal: React.FC<Props> = ({
 
             {/* Main Content Area */}
             <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
+              {/* ======================================================== */}
+              {/* TAB 0: SUPPLIERS & CLOSEST SOURCING (Bob Shop / Perfect Dealz) */}
+              {/* ======================================================== */}
+              {activeTab === "suppliers" && (
+                <div className="space-y-6">
+                  {/* Top Heading & Actions */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-extrabold text-[10px] uppercase tracking-wider">
+                          Verified Local Sourcing
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-extrabold text-[10px] uppercase tracking-wider">
+                          Bob Shop &amp; Perfect Dealz SA
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-black mt-1">Local Suppliers &amp; Closest Sourcing Catalog</h3>
+                      <p className="text-xs opacity-75 mt-0.5">
+                        Verified South African wholesale &amp; marketplace sources. Sourced to deliver the lowest cost, quickest local dispatch (2-3 days), and healthy 50%+ profit margins.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={fetchSourcingProducts}
+                        disabled={sourcingLoading}
+                        className="px-3 py-1.5 rounded-full border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                        title="Refresh sourcing prices"
+                      >
+                        <RefreshCw size={13} className={sourcingLoading ? "animate-spin" : ""} />
+                        <span>Refresh Sourcing</span>
+                      </button>
+
+                      <button
+                        onClick={handleResetSourcing}
+                        className="px-3.5 py-1.5 rounded-full bg-[#0A3D62] text-white dark:bg-[#F9CA24] dark:text-black text-xs font-bold hover:opacity-90 transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+                        title="Reset to verified supplier defaults"
+                      >
+                        <ShieldCheck size={13} />
+                        <span>Reset Sourcing Defaults</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Sourcing feedback alert */}
+                  {sourcingMessage && (
+                    <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-between animate-fade-in">
+                      <div className="flex items-center gap-2">
+                        <Check size={15} />
+                        <span>{sourcingMessage}</span>
+                      </div>
+                      <button onClick={() => setSourcingMessage("")} className="hover:opacity-75">
+                        <X size={14} />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Strategic Sourcing Summary Banner */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                      <div className="text-[11px] font-bold opacity-70 uppercase tracking-wider flex items-center gap-1.5">
+                        <Tag size={12} className="text-amber-500" />
+                        <span>Sourced Products</span>
+                      </div>
+                      <div className="text-2xl font-black mt-1 text-[#0A3D62] dark:text-[#F9CA24]">
+                        {sourcingProducts.length} Items
+                      </div>
+                      <div className="text-[10px] opacity-75 mt-0.5">All 100% locally stocked in SA</div>
+                    </div>
+
+                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                      <div className="text-[11px] font-bold opacity-70 uppercase tracking-wider flex items-center gap-1.5">
+                        <DollarSign size={12} className="text-emerald-500" />
+                        <span>Avg Wholesale Cost</span>
+                      </div>
+                      <div className="text-2xl font-black mt-1 text-emerald-600 dark:text-emerald-400">
+                        R
+                        {Math.round(
+                          sourcingProducts.reduce((sum, p) => sum + (p.supplierCostPrice || p.price * 0.5), 0) /
+                            (sourcingProducts.length || 1)
+                        )}
+                      </div>
+                      <div className="text-[10px] opacity-75 mt-0.5">Lowest cost per unit in SA</div>
+                    </div>
+
+                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                      <div className="text-[11px] font-bold opacity-70 uppercase tracking-wider flex items-center gap-1.5">
+                        <TrendingUp size={12} className="text-blue-500" />
+                        <span>Avg Profit Margin</span>
+                      </div>
+                      <div className="text-2xl font-black mt-1 text-blue-600 dark:text-blue-400">
+                        {Math.round(
+                          sourcingProducts.reduce((sum, p) => {
+                            const cost = p.supplierCostPrice || p.price * 0.5;
+                            return sum + ((p.price - cost) / p.price) * 100;
+                          }, 0) / (sourcingProducts.length || 1)
+                        )}
+                        %
+                      </div>
+                      <div className="text-[10px] opacity-75 mt-0.5">High retail gross yield</div>
+                    </div>
+
+                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                      <div className="text-[11px] font-bold opacity-70 uppercase tracking-wider flex items-center gap-1.5">
+                        <Truck size={12} className="text-purple-500" />
+                        <span>Local SA Dispatch</span>
+                      </div>
+                      <div className="text-2xl font-black mt-1 text-purple-600 dark:text-purple-400">
+                        2 - 3 Days
+                      </div>
+                      <div className="text-[10px] opacity-75 mt-0.5">JHB / CT warehouse hubs</div>
+                    </div>
+                  </div>
+
+                  {/* Sourcing Strategy Note */}
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                    <div className="flex items-start gap-2.5">
+                      <Sparkles className="text-amber-500 shrink-0 mt-0.5" size={17} />
+                      <div>
+                        <span className="font-extrabold text-amber-800 dark:text-amber-300">
+                          Why "Closest &amp; Cheapest" Local Sourcing?
+                        </span>
+                        <p className="opacity-80 mt-0.5 leading-relaxed">
+                          Rather than waiting 4-6 weeks for uncertain international imports with port duties and exchange-rate fluctuations, Cape Sun Co sources directly through <strong>Bob Shop SA</strong> (Super Electronics) and <strong>Perfect Dealz SA</strong>. Specifically, the <strong>X28 Sovo Solar Powered 20000mAh Power Bank</strong> is listed on Bob Shop at wholesale discount (~R260) with 4 built-in cables, providing our highest margin product!
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Filter and Search Bar */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1">
+                      {[
+                        { id: "all", label: "All Suppliers" },
+                        { id: "bobshop", label: "Bob Shop SA" },
+                        { id: "perfectdealz", label: "Perfect Dealz SA" },
+                      ].map((fil) => (
+                        <button
+                          key={fil.id}
+                          onClick={() => setSelectedSupplierFilter(fil.id)}
+                          className={`px-3 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap cursor-pointer ${
+                            selectedSupplierFilter === fil.id
+                              ? "bg-[#0A3D62] text-white dark:bg-[#F9CA24] dark:text-black font-black"
+                              : "border border-slate-200 dark:border-slate-700 hover:border-slate-400"
+                          }`}
+                        >
+                          {fil.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="relative w-full sm:w-64">
+                      <Search size={14} className="absolute left-3 top-2.5 text-slate-400" />
+                      <input
+                        type="text"
+                        placeholder="Search product or SKU..."
+                        value={sourcingSearch}
+                        onChange={(e) => setSourcingSearch(e.target.value)}
+                        className="w-full pl-8 pr-3 py-1.5 rounded-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Sourced Products Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {sourcingProducts
+                      .filter((prod) => {
+                        const s = sourcingSearch.toLowerCase();
+                        const matchText =
+                          prod.title.toLowerCase().includes(s) ||
+                          (prod.supplierSku || "").toLowerCase().includes(s) ||
+                          (prod.supplierName || "").toLowerCase().includes(s);
+
+                        if (!matchText) return false;
+                        if (selectedSupplierFilter === "bobshop") {
+                          return (prod.supplierName || "").toLowerCase().includes("bob shop");
+                        }
+                        if (selectedSupplierFilter === "perfectdealz") {
+                          return (prod.supplierName || "").toLowerCase().includes("perfect dealz");
+                        }
+                        return true;
+                      })
+                      .map((prod) => {
+                        const costPrice = prod.supplierCostPrice || Math.round(prod.price * 0.5);
+                        const profit = prod.price - costPrice;
+                        const marginPercent = Math.round((profit / prod.price) * 100);
+                        const isEditing = editingProductId === prod.id;
+                        const currentUnits = calcUnits[prod.id] || 10;
+                        const batchCost = costPrice * currentUnits;
+                        const batchRevenue = prod.price * currentUnits;
+                        const batchProfit = batchRevenue - batchCost;
+
+                        return (
+                          <div
+                            key={prod.id}
+                            className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-xs flex flex-col justify-between space-y-4 hover:border-slate-300 dark:hover:border-slate-700 transition"
+                          >
+                            <div className="space-y-3">
+                              {/* Header & Badges */}
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-2xl shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700">
+                                    {prod.image ? (
+                                      <img
+                                        src={prod.image}
+                                        alt={prod.title}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <span>{prod.emoji}</span>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">
+                                      {prod.badge || "Closest Sourced"}
+                                    </span>
+                                    <h4 className="font-extrabold text-sm leading-tight mt-1 line-clamp-1">
+                                      {prod.title}
+                                    </h4>
+                                    <div className="text-[11px] opacity-65 flex items-center gap-2 mt-0.5">
+                                      <span>SKU: {prod.supplierSku || `SKU-${prod.id}`}</span>
+                                      <span>•</span>
+                                      <span>Stock in CT: {prod.stock}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Supplier Link & Verified Source */}
+                              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 text-xs flex items-center justify-between">
+                                <div>
+                                  <div className="text-[10px] font-extrabold uppercase opacity-60">Verified Supplier Source</div>
+                                  <div className="font-bold text-slate-800 dark:text-slate-200 mt-0.5 flex items-center gap-1.5">
+                                    <span>{prod.supplierName || "Bob Shop SA / Local"}</span>
+                                  </div>
+                                </div>
+                                {prod.supplierUrl && (
+                                  <a
+                                    href={prod.supplierUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="px-2.5 py-1 rounded-lg bg-[#0A3D62] text-white dark:bg-[#F9CA24] dark:text-black text-[11px] font-bold flex items-center gap-1 hover:opacity-90 transition shadow-2xs"
+                                  >
+                                    <span>View Listing</span>
+                                    <ExternalLink size={11} />
+                                  </a>
+                                )}
+                              </div>
+
+                              {/* Pricing & Margins Grid */}
+                              {isEditing ? (
+                                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-3 text-xs">
+                                  <div className="font-black text-amber-700 dark:text-amber-400">
+                                    Edit Sourced Cost &amp; Retail Price
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                      <label className="text-[10px] font-bold block mb-1">
+                                        Wholesale Cost (ZAR)
+                                      </label>
+                                      <input
+                                        type="number"
+                                        value={editCostPrice}
+                                        onChange={(e) => setEditCostPrice(Number(e.target.value))}
+                                        className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-xs font-bold"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-[10px] font-bold block mb-1">
+                                        Retail Selling Price (ZAR)
+                                      </label>
+                                      <input
+                                        type="number"
+                                        value={editRetailPrice}
+                                        onChange={(e) => setEditRetailPrice(Number(e.target.value))}
+                                        className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-xs font-bold"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                                    New Margin: +R{editRetailPrice - editCostPrice} per unit (
+                                    {editRetailPrice > 0
+                                      ? Math.round(((editRetailPrice - editCostPrice) / editRetailPrice) * 100)
+                                      : 0}
+                                    %)
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => handleSavePriceEdit(prod.id)}
+                                      className="px-3 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700"
+                                    >
+                                      Save Price
+                                    </button>
+                                    <button
+                                      onClick={() => setEditingProductId(null)}
+                                      className="px-3 py-1 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-bold"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50">
+                                    <div className="text-[10px] font-bold opacity-60 uppercase">Wholesale Cost</div>
+                                    <div className="text-base font-black text-slate-800 dark:text-slate-100 mt-0.5">
+                                      R{costPrice}
+                                    </div>
+                                  </div>
+
+                                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50">
+                                    <div className="text-[10px] font-bold opacity-60 uppercase">Retail Selling</div>
+                                    <div className="text-base font-black text-[#0A3D62] dark:text-[#F9CA24] mt-0.5">
+                                      R{prod.price}
+                                    </div>
+                                  </div>
+
+                                  <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/40">
+                                    <div className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">
+                                      Profit Margin
+                                    </div>
+                                    <div className="text-base font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
+                                      +R{profit}{" "}
+                                      <span className="text-[10px] font-bold">({marginPercent}%)</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Special Product Sourcing Specs Summary */}
+                              {prod.id === "powerbank" && (
+                                <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/40 text-[11px] space-y-1">
+                                  <div className="font-extrabold text-blue-700 dark:text-blue-300">
+                                    ⚡ Bob Shop Listing Highlights (Model X28 Sovo):
+                                  </div>
+                                  <div className="opacity-80">
+                                    • Genuine 20000mAh cell with 4 built-in cables (Type-C, iPhone, Micro, USB-A)
+                                  </div>
+                                  <div className="opacity-80">
+                                    • Digital LED battery percentage display (0-100%) &amp; dual emergency torches
+                                  </div>
+                                  <div className="opacity-80">
+                                    • Listed by Super Electronics JHB on Bob Shop (Cost R260, Compare R699)
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Batch Outlay & Profit Calculator */}
+                            <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 space-y-2.5">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="font-bold flex items-center gap-1 opacity-80">
+                                  <Calculator size={13} className="text-amber-500" />
+                                  <span>Batch Order Profit Sim:</span>
+                                </span>
+                                <div className="flex items-center gap-1.5">
+                                  {[5, 10, 20, 50].map((qty) => (
+                                    <button
+                                      key={qty}
+                                      onClick={() => handleUpdateCalcUnit(prod.id, qty)}
+                                      className={`px-2 py-0.5 rounded text-[10px] font-bold transition cursor-pointer ${
+                                        currentUnits === qty
+                                          ? "bg-[#0A3D62] text-white dark:bg-[#F9CA24] dark:text-black font-black"
+                                          : "bg-slate-100 dark:bg-slate-800 hover:bg-slate-200"
+                                      }`}
+                                    >
+                                      {qty}u
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 text-[11px] font-mono flex items-center justify-between">
+                                <div>
+                                  <span className="opacity-60">Outlay ({currentUnits}u): </span>
+                                  <strong className="text-slate-800 dark:text-slate-200 font-sans">
+                                    R{batchCost.toLocaleString()}
+                                  </strong>
+                                </div>
+                                <div>
+                                  <span className="opacity-60">Revenue: </span>
+                                  <strong className="text-slate-800 dark:text-slate-200 font-sans">
+                                    R{batchRevenue.toLocaleString()}
+                                  </strong>
+                                </div>
+                                <div className="text-emerald-600 dark:text-emerald-400 font-bold font-sans">
+                                  Profit: +R{batchProfit.toLocaleString()}
+                                </div>
+                              </div>
+
+                              {!isEditing && (
+                                <button
+                                  onClick={() => handleStartPriceEdit(prod)}
+                                  className="w-full py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-center transition"
+                                >
+                                  Edit Sourced Cost &amp; Price
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
+
               {/* ======================================================== */}
               {/* TAB 1: CLIENT SWITCHER (Switch between client accounts) */}
               {/* ======================================================== */}
@@ -797,112 +1309,265 @@ export const AdminPortalModal: React.FC<Props> = ({
               )}
 
               {/* ======================================================== */}
-              {/* TAB 3: ORDER DISPATCH & THE COURIER GUY CONSOLE         */}
+              {/* TAB 3: ORDER DISPATCH & COURIER GUY / WHATSAPP CONSOLE   */}
               {/* ======================================================== */}
               {activeTab === "orders" && (
                 <div className="space-y-5">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <h3 className="text-lg font-black">Orders &amp; Dispatch Console</h3>
+                      <h3 className="text-lg font-black flex items-center gap-2">
+                        <span>Courier &amp; WhatsApp Dispatch Console</span>
+                        <span className="text-xs bg-[#25D366] text-white px-2 py-0.5 rounded-full font-bold">
+                          Admin Only
+                        </span>
+                      </h3>
                       <p className="text-xs opacity-75">
-                        Advance order statuses (Hub Repacking &rarr; Dispatched &rarr; Delivered) and trigger automated
-                        WhatsApp notifications to customers.
+                        Manage parcel repacking, The Courier Guy waybills, and trigger automated WhatsApp notifications to customers.
                       </p>
                     </div>
 
                     <button
                       onClick={fetchOrders}
-                      className="px-3 py-1.5 rounded-full border border-slate-300 dark:border-slate-700 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-800 transition flex items-center gap-1.5"
+                      className="px-3 py-1.5 rounded-full border border-slate-300 dark:border-slate-700 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-800 transition flex items-center gap-1.5 cursor-pointer"
                     >
                       <RefreshCw size={13} className={ordersLoading ? "animate-spin" : ""} />
                       <span>Refresh Orders</span>
                     </button>
                   </div>
 
-                  <div className="space-y-3">
-                    {orders.map((ord) => (
-                      <div
-                        key={ord.orderCode}
-                        className={`p-4 rounded-2xl border space-y-3 ${
-                          isDarkMode ? "bg-[#1C2541]/50 border-slate-700" : "bg-slate-50 border-zinc-200"
-                        }`}
-                      >
-                        <div className="flex flex-wrap items-start justify-between gap-2">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-mono font-extrabold text-sm text-amber-500">{ord.orderCode}</span>
-                              <span className="text-xs font-bold">• {ord.customerName}</span>
-                              <span className="text-xs opacity-70">({ord.customerPhone})</span>
-                            </div>
-                            <div className="text-xs opacity-80 mt-1">
-                              {ord.productTitle} x{ord.quantity} ({ord.color}) • R{ord.total} ({ord.paymentMethod})
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <span className="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-black uppercase">
-                              {ord.status.replace(/_/g, " ")}
-                            </span>
-                            {onOpenOrderStatus && (
-                              <button
-                                onClick={() => onOpenOrderStatus(ord.orderCode)}
-                                className="px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-xs font-bold hover:opacity-80 transition flex items-center gap-1"
-                              >
-                                <ExternalLink size={12} />
-                                <span>Track</span>
-                              </button>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Waybill and checkpoint notes */}
-                        <div className="text-xs p-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 flex items-center justify-between gap-2">
-                          <div>
-                            <strong>Waybill:</strong> {ord.courier?.waybillNumber || "TCG-ZA-PENDING"} (The Courier Guy)
-                          </div>
-                          <div className="text-emerald-500 font-bold">
-                            Delivery Est: {ord.courier?.estimatedDelivery || "2-4 Working Days"}
-                          </div>
-                        </div>
-
-                        {/* Status transition action buttons */}
-                        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-200 dark:border-slate-700">
-                          <span className="text-[11px] font-bold opacity-70">Advance Status:</span>
-
-                          <button
-                            onClick={() => handleUpdateOrderStatus(ord.orderCode, "repacking")}
-                            disabled={dispatchUpdating === ord.orderCode}
-                            className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500/15 text-amber-600 hover:bg-amber-500/25 transition cursor-pointer"
-                          >
-                            CT Hub Repacking
-                          </button>
-
-                          <button
-                            onClick={() => handleUpdateOrderStatus(ord.orderCode, "dispatched")}
-                            disabled={dispatchUpdating === ord.orderCode}
-                            className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-500/15 text-blue-600 hover:bg-blue-500/25 transition cursor-pointer"
-                          >
-                            Hand to Courier Guy
-                          </button>
-
-                          <button
-                            onClick={() => handleUpdateOrderStatus(ord.orderCode, "out_for_delivery")}
-                            disabled={dispatchUpdating === ord.orderCode}
-                            className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-purple-500/15 text-purple-600 hover:bg-purple-500/25 transition cursor-pointer"
-                          >
-                            Out for Delivery
-                          </button>
-
-                          <button
-                            onClick={() => handleUpdateOrderStatus(ord.orderCode, "delivered")}
-                            disabled={dispatchUpdating === ord.orderCode}
-                            className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25 transition cursor-pointer"
-                          >
-                            Mark Delivered
-                          </button>
-                        </div>
+                  {/* Official Courier Rates Reference Matrix */}
+                  <div
+                    className={`p-4 rounded-2xl border text-xs space-y-2.5 ${
+                      isDarkMode
+                        ? "bg-[#1C2541]/70 border-slate-700 text-slate-200"
+                        : "bg-amber-50/80 border-amber-200 text-amber-950"
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="font-extrabold flex items-center gap-1.5 uppercase tracking-wide text-xs">
+                        <Truck size={14} className="text-amber-600 dark:text-amber-400" />
+                        <span>Official Courier Logistics Tariff Rates (Free Delivery Disabled)</span>
                       </div>
-                    ))}
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded bg-amber-200 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200">
+                        Zero Free Shipping Policy
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center pt-1 font-mono">
+                      <div className="p-2 rounded-lg bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+                        <div className="text-[10px] uppercase font-sans font-bold opacity-75">Local Cape Town</div>
+                        <div className="text-sm font-black text-emerald-600 dark:text-emerald-400">R85</div>
+                        <div className="text-[9px] opacity-70">2-3 Working Days</div>
+                      </div>
+                      <div className="p-2 rounded-lg bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+                        <div className="text-[10px] uppercase font-sans font-bold opacity-75">National SA</div>
+                        <div className="text-sm font-black text-[#0A3D62] dark:text-[#F9CA24]">R145</div>
+                        <div className="text-[9px] opacity-70">JHB, DBN, PTA 3-4d</div>
+                      </div>
+                      <div className="p-2 rounded-lg bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+                        <div className="text-[10px] uppercase font-sans font-bold opacity-75">Regional Outlying</div>
+                        <div className="text-sm font-black text-purple-600 dark:text-purple-400">R175</div>
+                        <div className="text-[9px] opacity-70">Non-metro 3-5d</div>
+                      </div>
+                      <div className="p-2 rounded-lg bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+                        <div className="text-[10px] uppercase font-sans font-bold opacity-75">Express Overnight</div>
+                        <div className="text-sm font-black text-rose-600 dark:text-rose-400">R195</div>
+                        <div className="text-[9px] opacity-70">Next Business Day</div>
+                      </div>
+                      <div className="p-2 rounded-lg bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 col-span-2 sm:col-span-1">
+                        <div className="text-[10px] uppercase font-sans font-bold opacity-75">International</div>
+                        <div className="text-sm font-black text-amber-600 dark:text-amber-400">R495</div>
+                        <div className="text-[9px] opacity-70">DHL Global 4-7d</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Order List */}
+                  <div className="space-y-4">
+                    {orders.map((ord) => {
+                      const cleanPhone = (ord.customerPhone || "").replace(/[^0-9]/g, "");
+                      const intlPhone = cleanPhone.startsWith("0") ? "27" + cleanPhone.slice(1) : cleanPhone;
+                      const waybillNo = ord.courier?.waybillNumber || `TCG-ZA-CT${ord.orderCode?.replace(/[^0-9]/g, "") || "48291"}`;
+                      const trackingUrl = ord.courier?.trackingUrl || `https://thecourierguy.co.za/tracking?waybill=${waybillNo}`;
+
+                      return (
+                        <div
+                          key={ord.orderCode}
+                          className={`p-4 sm:p-5 rounded-2xl border space-y-3.5 ${
+                            isDarkMode ? "bg-[#1C2541]/50 border-slate-700" : "bg-slate-50 border-zinc-200"
+                          }`}
+                        >
+                          <div className="flex flex-wrap items-start justify-between gap-2">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono font-extrabold text-sm text-amber-500">{ord.orderCode}</span>
+                                <span className="text-xs font-bold">• {ord.customerName}</span>
+                                <span className="text-xs opacity-70 font-mono">({ord.customerPhone})</span>
+                              </div>
+                              <div className="text-xs opacity-80 mt-1">
+                                {ord.productTitle} x{ord.quantity} ({ord.color || "Standard"}) • Total: <strong>R{ord.total}</strong> ({ord.paymentMethod})
+                              </div>
+                              <div className="text-[11px] opacity-75 mt-0.5">
+                                📍 <strong>Destination:</strong> {typeof ord.shippingAddress === "string" ? ord.shippingAddress : `${ord.shippingAddress?.street || ""}, ${ord.shippingAddress?.city || ""}, ${ord.shippingAddress?.province || ""}`}
+                              </div>
+                              <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5">
+                                🚚 <strong>Speed &amp; Rate:</strong> {ord.shippingSpeed || "Cape Town Local Courier (R85)"}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <span className="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-black uppercase">
+                                {ord.status?.replace(/_/g, " ") || "Processing"}
+                              </span>
+                              {onOpenOrderStatus && (
+                                <button
+                                  onClick={() => onOpenOrderStatus(ord.orderCode)}
+                                  className="px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-xs font-bold hover:opacity-80 transition flex items-center gap-1 cursor-pointer"
+                                >
+                                  <ExternalLink size={12} />
+                                  <span>Track</span>
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Waybill and courier details */}
+                          <div className="text-xs p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 flex flex-wrap items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <Truck size={14} className="text-[#0A3D62] dark:text-[#F9CA24]" />
+                              <div>
+                                <strong>Waybill:</strong> <span className="font-mono">{waybillNo}</span> (The Courier Guy)
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <a
+                                href={trackingUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 font-bold"
+                              >
+                                <span>Courier Guy Portal</span>
+                                <ExternalLink size={11} />
+                              </a>
+                              <span className="text-emerald-500 font-bold">
+                                Est: {ord.courier?.estimatedDelivery || "2-4 Working Days"}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Status transition action buttons */}
+                          <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-200 dark:border-slate-700">
+                            <span className="text-[11px] font-bold opacity-70">Advance Status:</span>
+
+                            <button
+                              onClick={() => handleUpdateOrderStatus(ord.orderCode, "repacking")}
+                              disabled={dispatchUpdating === ord.orderCode}
+                              className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500/15 text-amber-600 hover:bg-amber-500/25 transition cursor-pointer"
+                            >
+                              CT Hub Repacking
+                            </button>
+
+                            <button
+                              onClick={() => handleUpdateOrderStatus(ord.orderCode, "dispatched")}
+                              disabled={dispatchUpdating === ord.orderCode}
+                              className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-500/15 text-blue-600 hover:bg-blue-500/25 transition cursor-pointer"
+                            >
+                              Hand to Courier Guy
+                            </button>
+
+                            <button
+                              onClick={() => handleUpdateOrderStatus(ord.orderCode, "out_for_delivery")}
+                              disabled={dispatchUpdating === ord.orderCode}
+                              className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-purple-500/15 text-purple-600 hover:bg-purple-500/25 transition cursor-pointer"
+                            >
+                              Out for Delivery
+                            </button>
+
+                            <button
+                              onClick={() => handleUpdateOrderStatus(ord.orderCode, "delivered")}
+                              disabled={dispatchUpdating === ord.orderCode}
+                              className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25 transition cursor-pointer"
+                            >
+                              Mark Delivered
+                            </button>
+                          </div>
+
+                          {/* STORE OWNER WHATSAPP DISPATCH ACTIONS (ADMIN ONLY) */}
+                          <div className="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-2">
+                            <div className="flex items-center justify-between text-[11px] font-bold text-[#0A3D62] dark:text-[#F9CA24]">
+                              <div className="flex items-center gap-1.5">
+                                <MessageCircle size={13} className="text-[#25D366]" />
+                                <span>Store Admin WhatsApp Dispatch Notifications (Direct to Client):</span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(ord.customerPhone);
+                                  setCopiedOrderPhone(ord.orderCode);
+                                  setTimeout(() => setCopiedOrderPhone(null), 2000);
+                                }}
+                                className="text-[10px] px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 transition flex items-center gap-1 cursor-pointer font-bold"
+                              >
+                                <Copy size={10} />
+                                <span>{copiedOrderPhone === ord.orderCode ? "Copied!" : `Copy Phone: ${ord.customerPhone}`}</span>
+                              </button>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2">
+                              {/* 1. Send Order Packed */}
+                              <a
+                                href={`https://wa.me/${intlPhone}?text=${encodeURIComponent(
+                                  `📦 *Cape Sun Co Update for ${ord.customerName}:*\nHowzit! Your order *${ord.orderCode}* (${ord.productTitle}) is repacked and heat-sealed at our Cape Town hub. Ready for courier collection.`
+                                )}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="px-2.5 py-1.5 rounded-lg bg-[#25D366] text-white text-[11px] font-bold flex items-center gap-1.5 hover:brightness-105 transition shadow-xs"
+                              >
+                                <MessageCircle size={12} />
+                                <span>Send "Order Packed"</span>
+                              </a>
+
+                              {/* 2. Send Waybill & Tracking */}
+                              <a
+                                href={`https://wa.me/${intlPhone}?text=${encodeURIComponent(
+                                  `🚚 *Cape Sun Co Dispatch Update for ${ord.customerName}:*\nHowzit! Your order *${ord.orderCode}* has been handed to The Courier Guy.\n📦 Waybill: *${waybillNo}*\n🔗 Track: ${trackingUrl}\nEstimated Delivery: ${ord.shippingSpeed || "2-3 Working Days"}. Let us know when it arrives!`
+                                )}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="px-2.5 py-1.5 rounded-lg bg-[#0A3D62] text-white dark:bg-[#F9CA24] dark:text-black text-[11px] font-bold flex items-center gap-1.5 hover:opacity-90 transition shadow-xs"
+                              >
+                                <Send size={12} />
+                                <span>Send "Courier Waybill"</span>
+                              </a>
+
+                              {/* 3. Send Out for Delivery */}
+                              <a
+                                href={`https://wa.me/${intlPhone}?text=${encodeURIComponent(
+                                  `🛵 *Cape Sun Co Delivery Notice for ${ord.customerName}:*\nHowzit! The Courier Guy driver is out for delivery with parcel *${ord.orderCode}* today. Please ensure someone is available at: ${typeof ord.shippingAddress === "string" ? ord.shippingAddress : `${ord.shippingAddress?.street || ""}, ${ord.shippingAddress?.city || ""}`}. Stay cool!`
+                                )}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="px-2.5 py-1.5 rounded-lg bg-purple-600 text-white text-[11px] font-bold flex items-center gap-1.5 hover:bg-purple-700 transition shadow-xs"
+                              >
+                                <Truck size={12} />
+                                <span>Send "Out for Delivery"</span>
+                              </a>
+
+                              {/* 4. Direct WhatsApp Chat */}
+                              <a
+                                href={`https://wa.me/${intlPhone}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 text-[11px] font-bold flex items-center gap-1.5 transition"
+                              >
+                                <Phone size={11} />
+                                <span>Chat with Client</span>
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

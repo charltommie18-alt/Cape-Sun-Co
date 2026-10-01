@@ -52,8 +52,13 @@ export const IndividualCheckoutModal: React.FC<Props> = ({
   const [size, setSize] = useState(initialSize || (product.sizes ? product.sizes[0] : undefined));
   const [quantity, setQuantity] = useState(1);
   const [shippingMethod, setShippingMethod] = useState<
-    "Cape Town 2-Day (Free)" | "Express Overnight (R69)" | "National SA 2-3 Days (R49)"
-  >("Cape Town 2-Day (Free)");
+    | "Cape Town Local Courier (R85)"
+    | "National SA Main Centers (R145)"
+    | "Regional SA & Outlying (R175)"
+    | "Express Priority Overnight (R195)"
+    | "International Courier (R495)"
+  >("Cape Town Local Courier (R85)");
+  const [destinationCountry, setDestinationCountry] = useState("South Africa");
 
   // Customer Details
   const [customerName, setCustomerName] = useState(currentUser?.fullName || "Sipho Khumalo");
@@ -111,11 +116,15 @@ export const IndividualCheckoutModal: React.FC<Props> = ({
   // Pricing calculation
   const baseItemPrice = product.price * quantity;
   const shippingCost =
-    shippingMethod === "Cape Town 2-Day (Free)"
-      ? 0
-      : shippingMethod === "Express Overnight (R69)"
-      ? 69
-      : 49;
+    shippingMethod === "Cape Town Local Courier (R85)"
+      ? 85
+      : shippingMethod === "National SA Main Centers (R145)"
+      ? 145
+      : shippingMethod === "Regional SA & Outlying (R175)"
+      ? 175
+      : shippingMethod === "Express Priority Overnight (R195)"
+      ? 195
+      : 495; // International Courier
 
   const totalBeforeDiscount = baseItemPrice + shippingCost;
   // Maximum discount is strictly capped at 20% - prevents any 100% off error
@@ -182,12 +191,12 @@ export const IndividualCheckoutModal: React.FC<Props> = ({
       shippingAddress: {
         street: `${street}, ${suburb}`,
         city,
-        province,
+        province: shippingMethod === "International Courier (R495)" ? `${province} (${destinationCountry})` : province,
         postalCode,
       },
       shippingSpeed: shippingMethod,
       createdAt: new Date().toISOString(),
-      status: "Processing in Cape Town Hub (2-3 day local delivery)",
+      status: "Confirmed at Cape Town Hub (Assigned to Courier)",
     };
 
     // Client fallback WhatsApp formatting
@@ -308,7 +317,7 @@ export const IndividualCheckoutModal: React.FC<Props> = ({
               </p>
             </div>
 
-            {/* AUTOMATED WHATSAPP NOTIFICATION SYSTEM */}
+            {/* AUTOMATED WHATSAPP NOTIFICATION RECEIPT (CUSTOMER ONLY) */}
             <div
               className={`max-w-xl mx-auto p-4 md:p-5 rounded-2xl border text-left space-y-4 ${
                 isDarkMode ? "bg-[#062c19]/40 border-emerald-800" : "bg-emerald-50/80 border-emerald-200"
@@ -321,140 +330,50 @@ export const IndividualCheckoutModal: React.FC<Props> = ({
                   </div>
                   <div>
                     <h3 className="text-sm font-extrabold text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
-                      <span>Automated WhatsApp Dispatch System</span>
+                      <span>Automated WhatsApp Dispatch Notifications</span>
                       <span className="text-[10px] bg-[#25D366] text-white px-2 py-0.5 rounded-full uppercase font-black tracking-wider">
-                        Live Dispatched
+                        Active
                       </span>
                     </h3>
                     <p className="text-[11px] opacity-80">
-                      Both you and our Cape Town warehouse team have received instant notifications.
+                      Your order confirmation and courier waybill tracking updates are dispatched automatically to your WhatsApp.
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Two Automated Notification Cards: Customer & Hub */}
-              <div className="grid sm:grid-cols-2 gap-3">
-                {/* 1. Customer Confirmation Card */}
-                <div
-                  className={`p-3.5 rounded-xl border flex flex-col justify-between ${
-                    isDarkMode ? "bg-[#0B132B]/90 border-slate-700" : "bg-white border-zinc-200 shadow-sm"
-                  }`}
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-[#0A3D62] dark:text-[#F9CA24]">
-                        <Smartphone size={14} className="text-[#25D366]" />
-                        <span>Customer WhatsApp</span>
-                      </div>
-                      <span className="inline-flex items-center gap-1 text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                        <Check size={11} /> Sent &amp; Logged
-                      </span>
-                    </div>
-
-                    <div className="text-xs">
-                      <span className="opacity-70 text-[11px]">Dispatched to your number:</span>
-                      <div className="font-extrabold text-xs text-emerald-600 dark:text-emerald-400 font-mono mt-0.5">
-                        {completedOrder.customerPhone}
-                      </div>
-                    </div>
-
-                    <div className="text-[11px] p-2.5 rounded-lg bg-emerald-500/5 border border-emerald-500/20 text-emerald-900 dark:text-emerald-200 space-y-1">
-                      <div className="font-bold flex items-center gap-1 text-[10px] uppercase tracking-wider text-[#25D366]">
-                        <CheckCircle size={12} /> No Action Needed From You
-                      </div>
-                      <p className="text-[10px] sm:text-[11px] leading-relaxed opacity-90">
-                        You do not need to message us. All live dispatch waybills and Courier Guy tracking links will arrive automatically on your WhatsApp.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 2. Warehouse & Store Owner Alert Card */}
-                <div
-                  className={`p-3.5 rounded-xl border flex flex-col justify-between ${
-                    isDarkMode ? "bg-[#0B132B]/90 border-slate-700" : "bg-white border-zinc-200 shadow-sm"
-                  }`}
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-[#0A3D62] dark:text-[#F9CA24]">
-                        <Bell size={14} className="text-amber-500" />
-                        <span>Store Owner Alert</span>
-                      </div>
-                      <span className="inline-flex items-center gap-1 text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                        <Check size={11} /> Received at Hub
-                      </span>
-                    </div>
-
-                    <div className="text-xs">
-                      <span className="opacity-70 text-[11px]">Fulfillment Terminal:</span>
-                      <div className="font-extrabold text-xs text-amber-500 font-mono mt-0.5">
-                        +27 66 286 0184 (Cape Sun Hub)
-                      </div>
-                    </div>
-
-                    <div className="text-[11px] p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
-                      <div className="font-bold text-[10px] uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                        <PackageCheck size={12} /> Warehouse Action
-                      </div>
-                      <p className="text-[10px] sm:text-[11px] leading-relaxed opacity-80">
-                        Cape Town warehouse received order {completedOrder.orderCode}. Packing started for local 2-3 day delivery.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* STORE OWNER CONTROLS: "so I can send customers WhatsApp with updates" */}
+              {/* Customer Confirmation Card */}
               <div
-                className={`pt-3 border-t border-emerald-500/20 text-xs ${
-                  isDarkMode ? "text-slate-200" : "text-slate-800"
+                className={`p-4 rounded-xl border flex flex-col justify-between ${
+                  isDarkMode ? "bg-[#0B132B]/90 border-slate-700" : "bg-white border-zinc-200 shadow-sm"
                 }`}
               >
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                  <div className="flex items-center gap-1.5 font-bold text-[11px] text-[#0A3D62] dark:text-[#F9CA24]">
-                    <Send size={12} />
-                    <span>Store Owner Dispatch: Send Customer WhatsApp Update</span>
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#0A3D62] dark:text-[#F9CA24]">
+                      <Smartphone size={14} className="text-[#25D366]" />
+                      <span>Customer WhatsApp Notification Number</span>
+                    </div>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                      <Check size={11} /> Registered
+                    </span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText(completedOrder.customerPhone);
-                      setCopiedPhone(true);
-                      setTimeout(() => setCopiedPhone(false), 2000);
-                    }}
-                    className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 transition flex items-center gap-1 cursor-pointer"
-                  >
-                    <Copy size={10} />
-                    {copiedPhone ? "Copied Phone!" : `Copy Contact: ${completedOrder.customerPhone}`}
-                  </button>
-                </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <a
-                    href={`https://wa.me/${(completedOrder.customerPhone || "").replace(/[^0-9]/g, "").startsWith("0") ? "27" + (completedOrder.customerPhone || "").replace(/[^0-9]/g, "").slice(1) : (completedOrder.customerPhone || "").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-                      `📦 *Cape Sun Co Update for ${completedOrder.customerName}:*\nHowzit! Your order *${completedOrder.orderCode}* (${completedOrder.productTitle}) is packed at our Cape Town hub and assigned to courier dispatch.`
-                    )}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-3 py-1.5 rounded-lg bg-[#25D366] text-white font-extrabold text-[11px] flex items-center gap-1.5 hover:brightness-105 transition shadow-sm"
-                  >
-                    <MessageCircle size={12} />
-                    <span>Send "Order Packed" WhatsApp</span>
-                  </a>
+                  <div className="text-xs">
+                    <span className="opacity-70 text-[11px]">Courier &amp; dispatch updates queued to:</span>
+                    <div className="font-extrabold text-sm text-emerald-600 dark:text-emerald-400 font-mono mt-0.5">
+                      {completedOrder.customerPhone}
+                    </div>
+                  </div>
 
-                  <a
-                    href={`https://wa.me/${(completedOrder.customerPhone || "").replace(/[^0-9]/g, "").startsWith("0") ? "27" + (completedOrder.customerPhone || "").replace(/[^0-9]/g, "").slice(1) : (completedOrder.customerPhone || "").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-                      `🚚 *Cape Sun Co Dispatch Update for ${completedOrder.customerName}:*\nHowzit! Your order *${completedOrder.orderCode}* has been handed to The Courier Guy. Local Cape Town delivery in 24-48 hours. Let us know when it arrives!`
-                    )}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-3 py-1.5 rounded-lg bg-[#0A3D62] text-white dark:bg-[#F9CA24] dark:text-black font-extrabold text-[11px] flex items-center gap-1.5 hover:opacity-90 transition shadow-sm"
-                  >
-                    <Send size={12} />
-                    <span>Send "Courier Waybill" WhatsApp</span>
-                  </a>
+                  <div className="text-[11px] p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20 text-emerald-900 dark:text-emerald-200 space-y-1.5">
+                    <div className="font-bold flex items-center gap-1 text-[10px] uppercase tracking-wider text-[#25D366]">
+                      <CheckCircle size={12} /> Automated Courier Guy Dispatch Alerts
+                    </div>
+                    <p className="text-[10px] sm:text-[11px] leading-relaxed opacity-90">
+                      You do not need to take any manual steps or send messages. As soon as our Cape Town warehouse finishes quality inspection and hands your parcel to the courier, live waybill tracking links and SMS/WhatsApp notifications will arrive automatically on your phone.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -723,29 +642,41 @@ export const IndividualCheckoutModal: React.FC<Props> = ({
                 <div className="space-y-2 text-sm">
                   {[
                     {
-                      id: "Cape Town 2-Day (Free)",
-                      title: "Cape Town Local Delivery (2-3 Days)",
-                      desc: "Dispatched from Cape Town Hub (2-3 business days)",
-                      price: "FREE",
+                      id: "Cape Town Local Courier (R85)",
+                      title: "Cape Town Local Courier (2-3 Days)",
+                      desc: "The Courier Guy door-to-door delivery across Cape Town metro & Western Cape",
+                      price: "R85",
                     },
                     {
-                      id: "Express Overnight (R69)",
-                      title: "Express Overnight Priority",
-                      desc: "Next business day priority dispatch",
-                      price: "R69",
+                      id: "National SA Main Centers (R145)",
+                      title: "National SA Main Centers (3-4 Days)",
+                      desc: "Johannesburg, Pretoria, Durban, Gqeberha, Bloemfontein door-to-door courier",
+                      price: "R145",
                     },
                     {
-                      id: "National SA 2-3 Days (R49)",
-                      title: "National South Africa Delivery",
-                      desc: "JHB, Pretoria, Durban & regional areas (take longer, 3-5 days)",
-                      price: "R49",
+                      id: "Regional SA & Outlying (R175)",
+                      title: "Regional & Outlying Areas SA (3-5 Days)",
+                      desc: "Non-metro, agricultural, township & regional destinations nationwide",
+                      price: "R175",
+                    },
+                    {
+                      id: "Express Priority Overnight (R195)",
+                      title: "Express Priority Overnight",
+                      desc: "Next business day priority express air courier to your door",
+                      price: "R195",
+                    },
+                    {
+                      id: "International Courier (R495)",
+                      title: "International Courier (4-7 Days)",
+                      desc: "DHL Express priority international door-to-door worldwide shipping",
+                      price: "R495",
                     },
                   ].map((opt) => (
                     <label
                       key={opt.id}
                       className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition ${
                         shippingMethod === opt.id
-                          ? "border-[#0A3D62] dark:border-[#F9CA24] bg-[#0A3D62]/5 dark:bg-[#F9CA24]/10"
+                          ? "border-[#0A3D62] dark:border-[#F9CA24] bg-[#0A3D62]/5 dark:bg-[#F9CA24]/10 shadow-xs"
                           : "border-slate-200 dark:border-slate-700 hover:border-slate-300"
                       }`}
                     >
@@ -762,10 +693,31 @@ export const IndividualCheckoutModal: React.FC<Props> = ({
                           <div className="text-xs opacity-70">{opt.desc}</div>
                         </div>
                       </div>
-                      <span className="font-bold text-sm text-emerald-600 dark:text-emerald-400">{opt.price}</span>
+                      <span className="font-extrabold text-sm text-[#0A3D62] dark:text-[#F9CA24]">{opt.price}</span>
                     </label>
                   ))}
                 </div>
+
+                {/* International destination country input when international courier selected */}
+                {shippingMethod === "International Courier (R495)" && (
+                  <div className="mt-3 p-3.5 rounded-xl border border-amber-300 dark:border-amber-700/60 bg-amber-50/70 dark:bg-amber-950/30">
+                    <label className="block text-xs font-bold text-amber-900 dark:text-amber-200 mb-1">
+                      International Destination Country
+                    </label>
+                    <input
+                      type="text"
+                      value={destinationCountry}
+                      onChange={(e) => setDestinationCountry(e.target.value)}
+                      placeholder="e.g. United Kingdom, USA, Germany, Namibia, Australia"
+                      className={`w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-[#F9CA24] ${
+                        isDarkMode ? "bg-[#0B132B] border-slate-700 text-white" : "bg-white border-zinc-300 text-slate-900"
+                      }`}
+                    />
+                    <p className="text-[11px] text-amber-800 dark:text-amber-300/80 mt-1">
+                      Air courier express with international door-to-door tracking and customs pre-clearance.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Step 3: Payment Gateway */}
@@ -1119,8 +1071,8 @@ export const IndividualCheckoutModal: React.FC<Props> = ({
                 </div>
                 <div className="flex justify-between">
                   <span className="opacity-70">Courier Shipping:</span>
-                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                    {shippingCost === 0 ? "FREE" : `R${shippingCost}`}
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    R{shippingCost}
                   </span>
                 </div>
                 {promoApplied && (
